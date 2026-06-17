@@ -26,11 +26,12 @@ public class MenuAdmin {
             System.out.println("2. Gerir Produtoras");
             System.out.println("3. Gerir Jogos");
             System.out.println("4. Gerir Produtos");
-            System.out.println("5. Gerir Clientes Especiais");
-            System.out.println("6. Gerir Promoções");
-            System.out.println("7. Registar Venda");
-            System.out.println("8. Estatísticas");
-            System.out.println("9. Alterar Password");
+            System.out.println("5. Gerir Localizações");
+            System.out.println("6. Gerir Clientes Especiais");
+            System.out.println("7. Gerir Promoções");
+            System.out.println("8. Registar Venda");
+            System.out.println("9. Estatísticas");
+            System.out.println("10. Alterar Password");
             System.out.println("0. Voltar");
             System.out.print("Opção: ");
             String op = sc.nextLine();
@@ -48,18 +49,21 @@ public class MenuAdmin {
                     menuProdutos();
                     break;
                 case "5":
-                    menuClientes();
+                    menuLocalizacoes();
                     break;
                 case "6":
-                    menuPromocoes();
+                    menuClientes();
                     break;
                 case "7":
-                    registarVenda();
+                    menuPromocoes();
                     break;
                 case "8":
-                    menuEstatisticas();
+                    registarVenda();
                     break;
                 case "9":
+                    menuEstatisticas();
+                    break;
+                case "10":
                     alterarPassword();
                     break;
                 case "0":
@@ -284,11 +288,10 @@ public class MenuAdmin {
                 case "2": {
                     System.out.print("Formato: "); String formato = sc.nextLine();
                     System.out.print("Plataforma: "); String plataforma = sc.nextLine();
-                    System.out.print("Localização: "); String local = sc.nextLine();
                     System.out.print("Preço custo: "); double pc = Double.parseDouble(sc.nextLine());
                     System.out.print("Preço venda: "); double pv = Double.parseDouble(sc.nextLine());
                     System.out.print("Stock: "); int stock = Integer.parseInt(sc.nextLine());
-                    Produto prod = new Produto(formato, plataforma, local, pc, pv, stock);
+                    Produto prod = new Produto(formato, plataforma, pc, pv, stock);
                     boolean addJogo = true;
                     while (addJogo) {
                         Jogo j = selecionarJogo();
@@ -296,6 +299,7 @@ public class MenuAdmin {
                         System.out.print("Adicionar outro jogo? (s/n): ");
                         addJogo = sc.nextLine().equalsIgnoreCase("s");
                     }
+                    gerirLocalizacoesProduto(prod, true);
                     ctrl.adicionarProduto(prod);
                     System.out.println("Adicionado.");
                     break;
@@ -308,7 +312,8 @@ public class MenuAdmin {
                         Produto p = lista.get(idx);
                         System.out.print("Novo formato (Enter para manter): "); String v = sc.nextLine(); if (!v.isEmpty()) p.setFormato(v);
                         System.out.print("Nova plataforma (Enter para manter): "); v = sc.nextLine(); if (!v.isEmpty()) p.setPlataforma(v);
-                        System.out.print("Nova localização (Enter para manter): "); v = sc.nextLine(); if (!v.isEmpty()) p.setLocalizacao(v);
+                        System.out.print("Gerir localizações? (s/n): ");
+                        if (sc.nextLine().equalsIgnoreCase("s")) gerirLocalizacoesProduto(p, false);
                         System.out.print("Novo preço custo (Enter para manter): "); v = sc.nextLine(); if (!v.isEmpty()) p.setPrecoCusto(Double.parseDouble(v));
                         System.out.print("Novo preço venda (Enter para manter): "); v = sc.nextLine(); if (!v.isEmpty()) p.setPrecoVenda(Double.parseDouble(v));
                         System.out.print("Novo stock (Enter para manter): "); v = sc.nextLine(); if (!v.isEmpty()) p.setStock(Integer.parseInt(v));
@@ -332,6 +337,102 @@ public class MenuAdmin {
                     System.out.println("Opção inválida.");
             }
         }
+    }
+
+    private void menuLocalizacoes() {
+        boolean exec = true;
+        while (exec) {
+            System.out.println("\n--- Localizações ---");
+            System.out.println("1. Listar");
+            System.out.println("2. Adicionar");
+            System.out.println("3. Editar");
+            System.out.println("4. Remover");
+            System.out.println("0. Voltar");
+            System.out.print("Opção: ");
+            String op = sc.nextLine();
+            List<Localizacao> lista = ctrl.listarLocalizacoes();
+            switch (op) {
+                case "1":
+                    for (Localizacao l : lista) {
+                        System.out.println(l.identificacao()
+                                + (l.getDescricao() != null && !l.getDescricao().isEmpty() ? " | " + l.getDescricao() : "")
+                                + " | Ocupado: " + ctrl.espacoOcupado(l) + "/" + l.getCapacidade());
+                    }
+                    break;
+                case "2": {
+                    Localizacao nova = lerLocalizacao(null);
+                    if (nova != null) {
+                        ctrl.adicionarLocalizacao(nova);
+                        System.out.println("Adicionado.");
+                    }
+                    break;
+                }
+                case "3": {
+                    for (int i = 0; i < lista.size(); i++) System.out.println(i + ". " + lista.get(i).identificacao());
+                    System.out.print("Índice a editar: ");
+                    int idx = Integer.parseInt(sc.nextLine());
+                    if (idx >= 0 && idx < lista.size()) {
+                        Localizacao editada = lerLocalizacao(lista.get(idx));
+                        if (editada != null) {
+                            ctrl.atualizarLocalizacao(idx, editada);
+                            System.out.println("Atualizado.");
+                        }
+                    }
+                    break;
+                }
+                case "4": {
+                    for (int i = 0; i < lista.size(); i++) System.out.println(i + ". " + lista.get(i).identificacao());
+                    System.out.print("Índice a remover: ");
+                    int idx = Integer.parseInt(sc.nextLine());
+                    ctrl.removerLocalizacao(idx);
+                    System.out.println("Removido.");
+                    break;
+                }
+                case "0":
+                    exec = false;
+                    break;
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        }
+    }
+
+    // Lê os dados de uma localização. Se 'base' != null, usa os seus valores como defaults (edição).
+    private Localizacao lerLocalizacao(Localizacao base) {
+        System.out.print("Tipo (1=Área, 2=Prateleira): ");
+        String t = sc.nextLine();
+        Localizacao.Tipo tipo;
+        if (t.equals("1")) {
+            tipo = Localizacao.Tipo.AREA;
+        } else if (t.equals("2")) {
+            tipo = Localizacao.Tipo.PRATELEIRA;
+        } else if (base != null) {
+            tipo = base.getTipo();
+        } else {
+            System.out.println("Tipo inválido.");
+            return null;
+        }
+
+        System.out.print("Nome" + (base != null ? " (Enter para manter '" + base.getNome() + "')" : "") + ": ");
+        String nome = sc.nextLine();
+        if (nome.isEmpty() && base != null) nome = base.getNome();
+
+        System.out.print("Capacidade (nº de jogos)" + (base != null ? " (Enter para manter '" + base.getCapacidade() + "')" : "") + ": ");
+        String cap = sc.nextLine();
+        int capacidade = (cap.isEmpty() && base != null) ? base.getCapacidade() : Integer.parseInt(cap);
+
+        int numeroPrateleira = base != null ? base.getNumeroPrateleira() : 0;
+        if (tipo == Localizacao.Tipo.PRATELEIRA) {
+            System.out.print("Número da prateleira" + (base != null ? " (Enter para manter '" + base.getNumeroPrateleira() + "')" : "") + ": ");
+            String np = sc.nextLine();
+            if (!np.isEmpty()) numeroPrateleira = Integer.parseInt(np);
+        }
+
+        System.out.print("Descrição" + (base != null ? " (Enter para manter)" : "") + ": ");
+        String descricao = sc.nextLine();
+        if (descricao.isEmpty() && base != null) descricao = base.getDescricao();
+
+        return new Localizacao(tipo, nome, capacidade, numeroPrateleira, descricao);
     }
 
     private void menuClientes() {
@@ -556,6 +657,87 @@ public class MenuAdmin {
         System.out.print("Escolher produto (índice): ");
         int idx = Integer.parseInt(sc.nextLine());
         return (idx >= 0 && idx < lista.size()) ? lista.get(idx) : null;
+    }
+
+    // Gere a lista de localizações de um produto (adicionar/remover). novo=true se o produto ainda não foi guardado.
+    private void gerirLocalizacoesProduto(Produto prod, boolean novo) {
+        boolean exec = true;
+        while (exec) {
+            System.out.println("\nLocalizações do produto:");
+            if (prod.getLocalizacoes().isEmpty()) {
+                System.out.println(" (nenhuma)");
+            } else {
+                for (Localizacao l : prod.getLocalizacoes()) System.out.println(" - " + l.identificacao());
+            }
+            System.out.println("1. Adicionar localização");
+            System.out.println("2. Remover localização");
+            System.out.println("0. Terminar");
+            System.out.print("Opção: ");
+            String op = sc.nextLine();
+            switch (op) {
+                case "1": {
+                    Localizacao l = selecionarLocalizacao(prod.getJogos().size(), novo ? null : prod);
+                    if (l != null) {
+                        if (prod.getLocalizacoes().contains(l)) {
+                            System.out.println("O produto já está nessa localização.");
+                        } else {
+                            prod.adicionarLocalizacao(l);
+                            System.out.println("Localização adicionada.");
+                        }
+                    }
+                    break;
+                }
+                case "2": {
+                    List<Localizacao> atuais = new ArrayList<>(prod.getLocalizacoes());
+                    if (atuais.isEmpty()) {
+                        System.out.println("Sem localizações para remover.");
+                        break;
+                    }
+                    for (int i = 0; i < atuais.size(); i++) System.out.println(i + ". " + atuais.get(i).identificacao());
+                    System.out.print("Índice a remover: ");
+                    int idx = Integer.parseInt(sc.nextLine());
+                    if (idx >= 0 && idx < atuais.size()) {
+                        prod.removerLocalizacao(atuais.get(idx));
+                        System.out.println("Localização removida.");
+                    }
+                    break;
+                }
+                case "0":
+                    exec = false;
+                    break;
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        }
+    }
+
+    // Escolhe uma localização validando que cabem nJogos. Devolve null se inválida ou sem espaço.
+    private Localizacao selecionarLocalizacao(int nJogos, Produto produtoAtual) {
+        List<Localizacao> lista = ctrl.listarLocalizacoes();
+        if (lista.isEmpty()) {
+            System.out.println("(Não existem localizações criadas.)");
+            return null;
+        }
+        for (int i = 0; i < lista.size(); i++) {
+            Localizacao l = lista.get(i);
+            System.out.println(i + ". " + l.identificacao() + " | Livre: " + ctrl.espacoLivre(l));
+        }
+        System.out.print("Escolher localização (índice, outro valor = cancelar): ");
+        int idx = Integer.parseInt(sc.nextLine());
+        if (idx < 0 || idx >= lista.size()) {
+            return null;
+        }
+        Localizacao escolhida = lista.get(idx);
+        if (!ctrl.cabe(escolhida, nJogos, produtoAtual)) {
+            int ocupado = ctrl.espacoOcupado(escolhida);
+            if (produtoAtual != null && produtoAtual.getLocalizacoes().contains(escolhida)) {
+                ocupado -= produtoAtual.getJogos().size();
+            }
+            System.out.println("Sem espaço: livre " + (escolhida.getCapacidade() - ocupado)
+                    + ", precisa " + nJogos + ".");
+            return null;
+        }
+        return escolhida;
     }
 
     private ClienteEspecial selecionarCliente() {

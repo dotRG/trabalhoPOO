@@ -10,18 +10,18 @@ public class Produto implements Serializable {
     private List<Jogo> jogos;
     private String formato;
     private String plataforma;
-    private String localizacao;
+    private List<Localizacao> localizacoes;
     private double precoCusto;
     private double precoVenda;
     private int stock;
     private boolean disponivel;
 
-    public Produto(String formato, String plataforma, String localizacao,
+    public Produto(String formato, String plataforma,
                    double precoCusto, double precoVenda, int stock) {
         this.jogos = new ArrayList<>();
+        this.localizacoes = new ArrayList<>();
         this.formato = formato;
         this.plataforma = plataforma;
-        this.localizacao = localizacao;
         this.precoCusto = precoCusto;
         this.precoVenda = precoVenda;
         this.stock = stock;
@@ -56,12 +56,18 @@ public class Produto implements Serializable {
         this.plataforma = plataforma;
     }
 
-    public String getLocalizacao() {
-        return localizacao;
+    public List<Localizacao> getLocalizacoes() {
+        return localizacoes;
     }
 
-    public void setLocalizacao(String localizacao) {
-        this.localizacao = localizacao;
+    public void adicionarLocalizacao(Localizacao l) {
+        if (!localizacoes.contains(l)) {
+            localizacoes.add(l);
+        }
+    }
+
+    public void removerLocalizacao(Localizacao l) {
+        localizacoes.remove(l);
     }
 
     public double getPrecoCusto() {
@@ -99,6 +105,10 @@ public class Produto implements Serializable {
 
     @Override
     public String toString() {
-        return "Produto [" + formato + " | " + plataforma + "] " + jogos + " | Stock: " + stock + " | " + precoVenda + "€";
+        List<String> nomes = new ArrayList<>();
+        for (Localizacao l : localizacoes) nomes.add(l.getNome());
+        String local = nomes.isEmpty() ? "Sem localização" : String.join(", ", nomes);
+        return "Produto [" + formato + " | " + plataforma + "] " + jogos
+                + " | Stock: " + stock + " | " + precoVenda + "€ | Local: " + local;
     }
 }
