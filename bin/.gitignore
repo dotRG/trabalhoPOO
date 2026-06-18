@@ -1,8 +1,3 @@
-/app/
 /controller/
-/model/
-/module-info.class
-/persistence/
-/ui/
 /utils/
-/gestao/
+/ui/

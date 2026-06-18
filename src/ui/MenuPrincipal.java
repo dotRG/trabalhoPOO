@@ -1,6 +1,7 @@
 package ui;
 
 import controller.LojaController;
+import utils.Input;
 
 import java.util.Scanner;
 
@@ -32,8 +33,7 @@ public class MenuPrincipal {
             System.out.println("1. Zona Administrador");
             System.out.println("2. Zona Cliente");
             System.out.println("0. Sair");
-            System.out.print("Opção: ");
-            String op = sc.nextLine();
+            String op = Input.lerOpcional(sc, "Opção: ");
 
             switch (op) {
                 case "1":
@@ -54,8 +54,7 @@ public class MenuPrincipal {
     }
 
     private void zonaAdmin() {
-        System.out.print("Password de administrador: ");
-        String pass = sc.nextLine();
+        String pass = Input.lerObrigatorio(sc, "Password de administrador: ");
         if (login.autenticarAdmin(pass)) {
             System.out.println("Login efetuado com sucesso.");
             menuAdmin.mostrar();

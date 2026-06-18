@@ -2,11 +2,11 @@ package ui;
 
 import controller.LojaController;
 import model.*;
+import utils.Input;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 public class MenuCliente {
     private final Scanner sc;
@@ -30,8 +30,7 @@ public class MenuCliente {
             System.out.println("7. Ver Produtos comprados pelos mesmos Clientes");
             System.out.println("8. Ver Diretores de uma Produtora");
             System.out.println("0. Voltar");
-            System.out.print("Opção: ");
-            String op = sc.nextLine();
+            String op = Input.lerOpcional(sc, "Opção: ");
             switch (op) {
                 case "1":
                     pesquisarJogoNome();
@@ -67,24 +66,21 @@ public class MenuCliente {
     }
 
     private void pesquisarJogoNome() {
-        System.out.print("Nome do jogo: ");
-        String nome = sc.nextLine();
+        String nome = Input.lerObrigatorio(sc, "Nome do jogo: ");
         List<Jogo> resultados = ctrl.pesquisarJogosPorNome(nome);
         for (Jogo j : resultados) System.out.println(j);
         perguntarExportar("jogos_por_nome.txt", toStringList(resultados));
     }
 
     private void pesquisarJogoDiretor() {
-        System.out.print("Nome do diretor: ");
-        String nome = sc.nextLine();
+        String nome = Input.lerObrigatorio(sc, "Nome do diretor: ");
         List<Jogo> resultados = ctrl.pesquisarJogosPorDiretor(nome);
         for (Jogo j : resultados) System.out.println(j);
         perguntarExportar("jogos_por_diretor.txt", toStringList(resultados));
     }
 
     private void pesquisarJogoEstilo() {
-        System.out.print("Estilo: ");
-        String estilo = sc.nextLine();
+        String estilo = Input.lerObrigatorio(sc, "Estilo: ");
         List<Jogo> resultados = ctrl.pesquisarJogosPorEstilo(estilo);
         for (Jogo j : resultados) System.out.println(j);
         perguntarExportar("jogos_por_estilo.txt", toStringList(resultados));
@@ -123,16 +119,14 @@ public class MenuCliente {
     }
 
     private void verDiretoresProdutora() {
-        System.out.print("Nome da produtora: ");
-        String nome = sc.nextLine();
+        String nome = Input.lerObrigatorio(sc, "Nome da produtora: ");
         List<Diretor> resultados = ctrl.listarDiretoresDaProdutora(nome);
         for (Diretor d : resultados) System.out.println(d);
         perguntarExportar("diretores_produtora.txt", toStringList(resultados));
     }
 
     private void perguntarExportar(String nomeFicheiro, List<String> linhas) {
-        System.out.print("Exportar resultados para ficheiro? (s/n): ");
-        if (sc.nextLine().equalsIgnoreCase("s")) {
+        if (Input.lerSimNao(sc, "Exportar resultados para ficheiro? (s/n): ")) {
             ctrl.exportarParaFicheiro(nomeFicheiro, linhas);
             System.out.println("Exportado para data/" + nomeFicheiro);
         }
@@ -146,17 +140,17 @@ public class MenuCliente {
 
     private Jogo selecionarJogo() {
         List<Jogo> lista = ctrl.listarJogos();
+        if (lista.isEmpty()) { System.out.println("(Não há jogos.)"); return null; }
         for (int i = 0; i < lista.size(); i++) System.out.println(i + ". " + lista.get(i));
-        System.out.print("Escolher jogo (índice): ");
-        int idx = Integer.parseInt(sc.nextLine());
-        return (idx >= 0 && idx < lista.size()) ? lista.get(idx) : null;
+        int idx = Input.lerInt(sc, "Escolher jogo (índice, -1 = cancelar): ", -1, lista.size() - 1);
+        return idx < 0 ? null : lista.get(idx);
     }
 
     private Produto selecionarProduto() {
         List<Produto> lista = ctrl.listarProdutos();
+        if (lista.isEmpty()) { System.out.println("(Não há produtos.)"); return null; }
         for (int i = 0; i < lista.size(); i++) System.out.println(i + ". " + lista.get(i));
-        System.out.print("Escolher produto (índice): ");
-        int idx = Integer.parseInt(sc.nextLine());
-        return (idx >= 0 && idx < lista.size()) ? lista.get(idx) : null;
+        int idx = Input.lerInt(sc, "Escolher produto (índice, -1 = cancelar): ", -1, lista.size() - 1);
+        return idx < 0 ? null : lista.get(idx);
     }
 }
