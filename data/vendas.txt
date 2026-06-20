@@ -1,0 +1,5 @@
+2026-06-05T10:30 | Empregado: Carlos | Produto: Cartucho | Qtd: 2 | Total: 39,98€ | Cliente: Ana Sousa | Promo: Saldos de Verão
+2026-06-06T16:15 | Empregado: Carlos | Produto: Blu-ray | Qtd: 1 | Total: 47,99€ | Cliente: Bruno Lima | Promo: Saldos de Verão
+2026-06-07T11:00 | Empregado: Sofia | Produto: DVD | Qtd: 3 | Total: 89,97€ | Cliente: Anónimo | Promo: Nenhuma
+2026-06-08T09:45 | Empregado: Sofia | Produto: CD | Qtd: 1 | Total: 15,99€ | Cliente: Ana Sousa | Promo: Saldos de Verão
+2026-06-09T18:20 | Empregado: Carlos | Produto: Cartucho | Qtd: 1 | Total: 24,99€ | Cliente: Bruno Lima | Promo: Nenhuma

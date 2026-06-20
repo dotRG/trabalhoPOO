@@ -1,3 +1,7 @@
+/app/
 /controller/
-/utils/
+/gestao/
+/model/
+/persistence/
 /ui/
+/utils/
