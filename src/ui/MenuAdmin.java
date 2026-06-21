@@ -370,7 +370,7 @@ public class MenuAdmin {
     }
 
     // Lê os dados de uma localização. Se 'base' != null, usa os seus valores como defaults (edição).
-    private Localizacao lerLocalizacao(Localizacao base) {
+    private Localizacao lerLocalizacao(Localizacao base) { 
         Localizacao.Tipo tipo;
         if (base == null) {
             int t = Input.lerInt(sc, "Tipo (1=Área, 2=Prateleira): ", 1, 2);

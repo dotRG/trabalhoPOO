@@ -68,6 +68,10 @@ public class MenuCliente {
     private void pesquisarJogoNome() {
         String nome = Input.lerObrigatorio(sc, "Nome do jogo: ");
         List<Jogo> resultados = ctrl.pesquisarJogosPorNome(nome);
+        if (resultados.isEmpty()) {
+            System.out.println("(Nenhum jogo encontrado.)");
+            return;
+        }
         for (Jogo j : resultados) System.out.println(j);
         perguntarExportar("jogos_por_nome.txt", toStringList(resultados));
     }
@@ -75,6 +79,10 @@ public class MenuCliente {
     private void pesquisarJogoDiretor() {
         String nome = Input.lerObrigatorio(sc, "Nome do diretor: ");
         List<Jogo> resultados = ctrl.pesquisarJogosPorDiretor(nome);
+        if (resultados.isEmpty()) {
+            System.out.println("(Nenhum jogo encontrado.)");
+            return;
+        }
         for (Jogo j : resultados) System.out.println(j);
         perguntarExportar("jogos_por_diretor.txt", toStringList(resultados));
     }
@@ -82,6 +90,10 @@ public class MenuCliente {
     private void pesquisarJogoEstilo() {
         String estilo = Input.lerObrigatorio(sc, "Estilo: ");
         List<Jogo> resultados = ctrl.pesquisarJogosPorEstilo(estilo);
+        if (resultados.isEmpty()) {
+            System.out.println("(Nenhum jogo encontrado.)");
+            return;
+        }
         for (Jogo j : resultados) System.out.println(j);
         perguntarExportar("jogos_por_estilo.txt", toStringList(resultados));
     }
@@ -90,6 +102,10 @@ public class MenuCliente {
         Jogo j = selecionarJogo();
         if (j == null) return;
         List<Produto> resultados = ctrl.produtosQueContemJogo(j);
+        if (resultados.isEmpty()) {
+            System.out.println("(Nenhum produto encontrado.)");
+            return;
+        }
         for (Produto p : resultados) System.out.println(p);
         perguntarExportar("produtos_com_jogo.txt", toStringList(resultados));
     }
@@ -98,6 +114,10 @@ public class MenuCliente {
         Jogo j = selecionarJogo();
         if (j == null || j.getDiretor() == null) return;
         List<Jogo> resultados = ctrl.pesquisarJogosPorDiretor(j.getDiretor().getNome());
+        if (resultados.isEmpty()) {
+            System.out.println("(Nenhum jogo encontrado.)");
+            return;
+        }
         for (Jogo g : resultados) System.out.println(g);
         perguntarExportar("jogos_mesmo_diretor.txt", toStringList(resultados));
     }
@@ -106,6 +126,10 @@ public class MenuCliente {
         Jogo j = selecionarJogo();
         if (j == null) return;
         List<Jogo> resultados = ctrl.pesquisarJogosPorEstilo(j.getEstilo());
+        if (resultados.isEmpty()) {
+            System.out.println("(Nenhum jogo encontrado.)");
+            return;
+        }
         for (Jogo g : resultados) System.out.println(g);
         perguntarExportar("jogos_mesmo_estilo.txt", toStringList(resultados));
     }
@@ -114,6 +138,10 @@ public class MenuCliente {
         Produto p = selecionarProduto();
         if (p == null) return;
         List<Produto> resultados = ctrl.produtosCompradosPorClientesQueCompraram(p);
+        if (resultados.isEmpty()) {
+            System.out.println("(Nenhum produto encontrado.)");
+            return;
+        }
         for (Produto pr : resultados) System.out.println(pr);
         perguntarExportar("produtos_mesmos_clientes.txt", toStringList(resultados));
     }
@@ -121,6 +149,10 @@ public class MenuCliente {
     private void verDiretoresProdutora() {
         String nome = Input.lerObrigatorio(sc, "Nome da produtora: ");
         List<Diretor> resultados = ctrl.listarDiretoresDaProdutora(nome);
+        if (resultados.isEmpty()) {
+            System.out.println("(Nenhum diretor encontrado.)");
+            return;
+        }
         for (Diretor d : resultados) System.out.println(d);
         perguntarExportar("diretores_produtora.txt", toStringList(resultados));
     }

@@ -3,6 +3,7 @@ package model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ClienteEspecial implements Serializable {
     private static final long serialVersionUID = 6L;
@@ -59,6 +60,21 @@ public class ClienteEspecial implements Serializable {
 
     public void adicionarCompra(Venda venda) {
         this.historicoCompras.add(venda);
+    }
+
+    // Um cliente especial é identificado pelo nome e email (não é anónimo).
+    // Permite reconhecer o mesmo cliente entre grafos de objetos distintos.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClienteEspecial that = (ClienteEspecial) o;
+        return Objects.equals(nome, that.nome) && Objects.equals(email, that.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nome, email);
     }
 
     @Override

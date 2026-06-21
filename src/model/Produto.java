@@ -2,7 +2,9 @@ package model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class Produto implements Serializable {
     private static final long serialVersionUID = 4L;
@@ -101,6 +103,33 @@ public class Produto implements Serializable {
 
     public void setDisponivel(boolean disponivel) {
         this.disponivel = disponivel;
+    }
+
+    // Nomes dos jogos ordenados — usado como parte da identidade do produto.
+    private List<String> nomesJogosOrdenados() {
+        List<String> nomes = new ArrayList<>();
+        for (Jogo j : jogos) nomes.add(j.getNome());
+        Collections.sort(nomes);
+        return nomes;
+    }
+
+    // Dois produtos são iguais se tiverem o mesmo formato, plataforma e o mesmo
+    // conjunto de jogos (comparados por nome). Isto permite reconhecer "o mesmo
+    // produto" mesmo quando os objetos vêm de ficheiros diferentes (produtos.dat
+    // vs vendas.dat), onde após desserialização as referências já não coincidem.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Produto produto = (Produto) o;
+        return Objects.equals(formato, produto.formato)
+                && Objects.equals(plataforma, produto.plataforma)
+                && nomesJogosOrdenados().equals(produto.nomesJogosOrdenados());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(formato, plataforma, nomesJogosOrdenados());
     }
 
     @Override
