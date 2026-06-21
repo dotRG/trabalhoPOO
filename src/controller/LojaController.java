@@ -176,6 +176,14 @@ public class LojaController {
         return loc.getCapacidade() - espacoOcupado(loc);
     }
 
+    // Lista derivada: os produtos que estão nesta localização (calculada a partir
+    // dos produtos, sem guardar a relação inversa na própria Localizacao).
+    public List<Produto> produtosEmLocalizacao(Localizacao loc) {
+        return gereProduto.listar().stream()
+                .filter(p -> p.getLocalizacoes().contains(loc))
+                .collect(Collectors.toList());
+    }
+
     // produtoAtual permite ignorar a contribuição do próprio produto se já estiver nessa localização
     public boolean cabe(Localizacao loc, int nJogos, Produto produtoAtual) {
         int ocupado = espacoOcupado(loc);
@@ -228,24 +236,45 @@ public class LojaController {
     public List<Produto> produtosCompradosPorClientesQueCompraram(Produto produto) {
         List<Venda> vendas = gereVenda.listar();
         Set<ClienteEspecial> compradores = vendas.stream()
-                .filter(v -> v.getProduto().equals(produto) && v.getCliente() != null)
+                .filter(v -> v.getCliente() != null
+                        && v.getItens().stream().anyMatch(it -> it.getProduto().equals(produto)))
                 .map(Venda::getCliente)
                 .collect(Collectors.toSet());
 
         return vendas.stream()
                 .filter(v -> compradores.contains(v.getCliente()))
-                .map(Venda::getProduto)
+                .flatMap(v -> v.getItens().stream())
+                .map(ItemVenda::getProduto)
                 .distinct()
                 .collect(Collectors.toList());
     }
 
     // ===================== VENDAS =====================
-    public boolean registarVenda(String empregado, Produto produto, int quantidade, ClienteEspecial cliente) {
-        if (produto.getStock() < quantidade) {
+    // Uma venda pode conter vários produtos (linhas). Devolve false se faltar stock
+    // para algum produto (validado pela soma das quantidades por produto).
+    public boolean registarVenda(String empregado, List<ItemVenda> itens, ClienteEspecial cliente) {
+        if (itens == null || itens.isEmpty()) {
             return false;
         }
 
-        double precoFinal = produto.getPrecoVenda() * quantidade;
+        // Validar stock: somar as quantidades pedidas por produto (usa Produto.equals)
+        Map<Produto, Integer> pedidoPorProduto = new HashMap<>();
+        for (ItemVenda it : itens) {
+            pedidoPorProduto.merge(it.getProduto(), it.getQuantidade(), Integer::sum);
+        }
+        for (Map.Entry<Produto, Integer> e : pedidoPorProduto.entrySet()) {
+            if (e.getKey().getStock() < e.getValue()) {
+                return false;
+            }
+        }
+
+        // Total bruto (soma dos subtotais das linhas)
+        double precoFinal = 0;
+        for (ItemVenda it : itens) {
+            precoFinal += it.getSubtotal();
+        }
+
+        // Aplicar a primeira promoção ativa ao total da venda
         Promocao ativa = null;
         for (Promocao p : gerePromocao.listar()) {
             if (p.estaAtiva()) {
@@ -255,10 +284,13 @@ public class LojaController {
             }
         }
 
-        produto.setStock(produto.getStock() - quantidade);
+        // Baixar stock de cada produto
+        for (Map.Entry<Produto, Integer> e : pedidoPorProduto.entrySet()) {
+            e.getKey().setStock(e.getKey().getStock() - e.getValue());
+        }
         gereProduto.guardar();
 
-        Venda v = new Venda(empregado, produto, quantidade, precoFinal, LocalDateTime.now(), ativa, cliente);
+        Venda v = new Venda(empregado, itens, precoFinal, LocalDateTime.now(), ativa, cliente);
         gereVenda.adicionar(v);
 
         if (cliente != null) {
@@ -267,8 +299,14 @@ public class LojaController {
         }
 
         // Guardar em ficheiro de texto
-        String linha = String.format("%s | Empregado: %s | Produto: %s | Qtd: %d | Total: %.2f€ | Cliente: %s | Promo: %s",
-                v.getDataVenda(), empregado, produto.getFormato(), quantidade, precoFinal,
+        StringBuilder itensStr = new StringBuilder();
+        for (int i = 0; i < itens.size(); i++) {
+            if (i > 0) itensStr.append("; ");
+            itensStr.append(itens.get(i).getProduto().getFormato())
+                    .append(" x").append(itens.get(i).getQuantidade());
+        }
+        String linha = String.format("%s | Empregado: %s | Itens: %s | Total: %.2f€ | Cliente: %s | Promo: %s",
+                v.getDataVenda(), empregado, itensStr, precoFinal,
                 cliente != null ? cliente.getNome() : "Anónimo",
                 ativa != null ? ativa.getNome() : "Nenhuma");
         tfmVendas.escreverLinha(linha, true);
@@ -283,7 +321,8 @@ public class LojaController {
     // ===================== ESTATÍSTICAS =====================
     public List<Map.Entry<Jogo, Long>> jogosMaisVendidos() {
         return gereVenda.listar().stream()
-                .flatMap(v -> v.getProduto().getJogos().stream())
+                .flatMap(v -> v.getItens().stream())
+                .flatMap(it -> it.getProduto().getJogos().stream())
                 .collect(Collectors.groupingBy(j -> j, Collectors.counting()))
                 .entrySet().stream()
                 .sorted(Map.Entry.<Jogo, Long>comparingByValue().reversed())
@@ -292,7 +331,8 @@ public class LojaController {
 
     public List<Map.Entry<String, Long>> estilosMaisProcurados() {
         return gereVenda.listar().stream()
-                .flatMap(v -> v.getProduto().getJogos().stream())
+                .flatMap(v -> v.getItens().stream())
+                .flatMap(it -> it.getProduto().getJogos().stream())
                 .map(Jogo::getEstilo)
                 .collect(Collectors.groupingBy(e -> e, Collectors.counting()))
                 .entrySet().stream()
@@ -302,7 +342,8 @@ public class LojaController {
 
     public List<Map.Entry<Diretor, Long>> diretoresMaisVendidos() {
         return gereVenda.listar().stream()
-                .flatMap(v -> v.getProduto().getJogos().stream())
+                .flatMap(v -> v.getItens().stream())
+                .flatMap(it -> it.getProduto().getJogos().stream())
                 .map(Jogo::getDiretor)
                 .filter(Objects::nonNull)
                 .collect(Collectors.groupingBy(d -> d, Collectors.counting()))
@@ -313,7 +354,8 @@ public class LojaController {
 
     public List<Map.Entry<Produtora, Long>> produtorasMaisVendidas() {
         return gereVenda.listar().stream()
-                .flatMap(v -> v.getProduto().getJogos().stream())
+                .flatMap(v -> v.getItens().stream())
+                .flatMap(it -> it.getProduto().getJogos().stream())
                 .map(Jogo::getProdutora)
                 .filter(Objects::nonNull)
                 .collect(Collectors.groupingBy(p -> p, Collectors.counting()))

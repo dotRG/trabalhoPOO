@@ -7,18 +7,25 @@ Este manual descreve como utilizar o sistema de gestão de loja de jogos desenvo
 ## 2. Instalação e Execução
 
 ### Requisitos
-- Java JDK 17 ou superior
+Para executar a aplicação é necessário:
 
-### Execução
-1. Abra um terminal na pasta do projeto.
-2. Compile o projeto:
-   ```bash
-   javac -d out -sourcepath src src/Main.java
-   ```
-3. Execute o programa:
-   ```bash
-   java -cp out Main
-   ```
+- Java JDK 17 ou superior;
+- Eclipse IDE;
+- Projeto importado para o ambiente de desenvolvimento Eclipse.
+
+### Importação do Projeto
+1. Abrir o Eclipse
+2. Selecionar o workspace pretendido.
+3. No menu superior, escolher File → Import.
+4. Selecionar General → Existing Projects into Workspace.
+5. Escolher a pasta onde se encontra o projeto.
+6. Confirmar a importação.
+
+### Execução da Aplicação
+1. No explorador de projetos do Eclipse, localizar a classe Main.
+2. Clicar com o botão direito sobre a classe.
+3. Selecionar Run As → Java Application.
+4. A aplicação será iniciada e será apresentado o menu principal.
 
 ## 3. Ecrã Inicial
 
@@ -34,7 +41,7 @@ Ao iniciar o programa, é apresentado o menu principal:
 ## 4. Zona Administrador
 
 ### Login
-A password pré-definida é `admin123`. Após o primeiro login, a password é encriptada automaticamente. Pode alterá-la no menu de administrador.
+A password inicial é `admin123`. Após o primeiro login, a password passa a ser armazenada de forma encriptada. Pode alterá-la no menu de administrador.
 
 ### Funcionalidades
 - **Gerir Diretores**: adicionar, listar, editar e remover diretores.
@@ -62,14 +69,32 @@ Funcionalidades disponíveis sem necessidade de login:
 ### Exportação
 Após cada pesquisa, o sistema pergunta se pretende exportar os resultados para um ficheiro de texto na pasta `data/`.
 
-## 6. Ficheiros de Dados
+## 6. Exemplos de Utilização
+
+### Pesquisa de um Jogo
+
+1. Selecionar a Zona Cliente.
+2. Escolher a opção "Pesquisar Jogo por Nome".
+3. Introduzir o nome pretendido.
+4. O sistema apresenta todos os jogos encontrados.
+
+### Registo de uma Venda
+
+1. Entrar na Zona Administrador.
+2. Selecionar "Registar Venda".
+3. Escolher o produto e a quantidade.
+4. Confirmar a operação.
+
+O sistema atualiza automaticamente o stock e regista a venda.
+
+## 7. Ficheiros de Dados
 
 Todos os dados são guardados na pasta `data/`:
 - `diretores.dat`, `produtoras.dat`, `jogos.dat`, `produtos.dat`, `vendas.dat`, `clientes.dat`, `promocoes.dat` - ficheiros binários de objetos.
 - `vendas.txt` - registo de vendas em formato de texto.
 - `pass.txt` - password do administrador (encriptada após primeiro login).
 
-## 7. Notas Importantes
+## 8. Notas Importantes
 - Não elimine a pasta `data/` pois contém toda a informação persistente.
 - A password apenas pode ser alterada na zona de administrador.
 - As promoções ativas são aplicadas automaticamente no registo de vendas.

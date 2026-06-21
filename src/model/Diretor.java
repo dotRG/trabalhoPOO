@@ -2,6 +2,7 @@ package model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Diretor implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -79,6 +80,20 @@ public class Diretor implements Serializable {
 
     public void setObservacoes(String observacoes) {
         this.observacoes = observacoes;
+    }
+
+    // Identidade por chave de negócio: o nome do diretor.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Diretor diretor = (Diretor) o;
+        return Objects.equals(nome, diretor.nome);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nome);
     }
 
     @Override

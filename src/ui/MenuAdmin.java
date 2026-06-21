@@ -335,6 +335,15 @@ public class MenuAdmin {
                         System.out.println(l.identificacao()
                                 + (l.getDescricao() != null && !l.getDescricao().isEmpty() ? " | " + l.getDescricao() : "")
                                 + " | Ocupado: " + ctrl.espacoOcupado(l) + "/" + l.getCapacidade());
+                        List<Produto> produtosLoc = ctrl.produtosEmLocalizacao(l);
+                        if (produtosLoc.isEmpty()) {
+                            System.out.println("    (sem produtos)");
+                        } else {
+                            for (Produto p : produtosLoc) {
+                                System.out.println("    - " + p.getFormato() + " / " + p.getPlataforma()
+                                        + " (" + p.getJogos().size() + " jogo(s))");
+                            }
+                        }
                     }
                     break;
                 case "2": {
@@ -535,15 +544,27 @@ public class MenuAdmin {
 
     private void registarVenda() {
         System.out.println("\n--- Registar Venda ---");
-        Produto prod = selecionarProduto();
-        if (prod == null) return;
-        int qtd = Input.lerInt(sc, "Quantidade: ", 1, Integer.MAX_VALUE);
+        List<ItemVenda> itens = new ArrayList<>();
+        boolean adicionar = true;
+        while (adicionar) {
+            Produto prod = selecionarProduto();
+            if (prod != null) {
+                int qtd = Input.lerInt(sc, "Quantidade: ", 1, Integer.MAX_VALUE);
+                itens.add(new ItemVenda(prod, qtd));
+                System.out.println("Adicionado: " + prod.getFormato() + " x" + qtd);
+            }
+            adicionar = Input.lerSimNao(sc, "Adicionar outro produto à venda? (s/n): ");
+        }
+        if (itens.isEmpty()) {
+            System.out.println("Venda cancelada (sem produtos).");
+            return;
+        }
         String empregado = Input.lerObrigatorio(sc, "Nome do empregado: ");
         ClienteEspecial cli = Input.lerSimNao(sc, "Cliente especial? (s/n): ") ? selecionarCliente() : null;
-        if (ctrl.registarVenda(empregado, prod, qtd, cli)) {
+        if (ctrl.registarVenda(empregado, itens, cli)) {
             System.out.println("Venda registada com sucesso.");
         } else {
-            System.out.println("Stock insuficiente.");
+            System.out.println("Stock insuficiente nalgum produto.");
         }
     }
 

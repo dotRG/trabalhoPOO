@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Jogo implements Serializable {
     private static final long serialVersionUID = 3L;
@@ -67,6 +68,21 @@ public class Jogo implements Serializable {
 
     public void setEstilo(String estilo) {
         this.estilo = estilo;
+    }
+
+    // Identidade por chave de negócio: o título do jogo. Permite reconhecer o mesmo
+    // jogo entre grafos de objetos distintos (ex.: jogos.dat vs vendas.dat).
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Jogo jogo = (Jogo) o;
+        return Objects.equals(nome, jogo.nome);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nome);
     }
 
     @Override

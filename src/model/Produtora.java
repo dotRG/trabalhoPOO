@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Produtora implements Serializable {
     private static final long serialVersionUID = 2L;
@@ -68,6 +69,20 @@ public class Produtora implements Serializable {
 
     public void setObservacoes(String observacoes) {
         this.observacoes = observacoes;
+    }
+
+    // Identidade por chave de negócio: o nome da produtora.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Produtora produtora = (Produtora) o;
+        return Objects.equals(nome, produtora.nome);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nome);
     }
 
     @Override
